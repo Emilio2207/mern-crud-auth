@@ -1,5 +1,9 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { registerRequest, loginResquest } from "../api/auth.js";
+import {
+  registerRequest,
+  loginResquest,
+  verifyTokenRequet,
+} from "../api/auth.js";
 import Cookies from "js-cookie";
 
 export const AuthContext = createContext();
@@ -16,6 +20,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [errors, setErrors] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const signup = async (user) => {
     try {
@@ -53,11 +58,34 @@ export const AuthProvider = ({ children }) => {
   }, [errors]);
 
   useEffect(() => {
-    const cookies = Cookies.get();
+    // function ECMAScript 5
+    async function checkLogin() {
+      const cookies = Cookies.get();
 
-    if (cookies.token) {
-      console.log(cookies.token);
+      if (!cookies.token) {
+        setIsAuthenticated(false);
+        setLoading(false);
+        return setUser(null);
+      }
+
+      try {
+        const res = await verifyTokenRequet(cookies.token);
+        if (!res.data) {
+          setIsAuthenticated(false);
+          setLoading(false);
+          return;
+        }
+
+        setIsAuthenticated(true);
+        setUser(res.data);
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
+        setIsAuthenticated(false);
+        setUser(null);
+      }
     }
+    checkLogin();
   }, []);
 
   return (
@@ -68,6 +96,7 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated,
         errors,
         signin,
+        loading,
       }}
     >
       {children}
