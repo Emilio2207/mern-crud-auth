@@ -28,7 +28,7 @@ function LoginPage() {
             {error}
           </div>
         ))}
-        <h1 className="text-2xl font-bold">Acceso</h1>
+        <h1 className="text-3xl font-bold my-2">Acceso</h1>
         <form onSubmit={onSubmit}>
           <input
             type="email"
@@ -46,7 +46,12 @@ function LoginPage() {
           {errors.password && (
             <p className="text-red-500">Password es requerido</p>
           )}
-          <button type="submit">Login</button>
+          <button
+            type="submit"
+            className="bg-sky-500 text-white px-4 py-2 rounded-md my-2"
+          >
+            Login
+          </button>
         </form>
 
         <p className="flex gap-x-2 justify-between">
